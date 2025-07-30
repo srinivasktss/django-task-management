@@ -1,0 +1,33 @@
+{
+    "servers": {
+        "postgres_db": {
+            "command": "docker",
+            "args": [
+                "run",
+                "-i",
+                "--rm",
+                "-e",
+                "POSTGRES_URL",
+                "mcp/postgres",
+                "postgresql://localhost:5432/taskmanagement"
+            ],
+            "env": {
+                "POSTGRES_URL": "postgresql://localhost:5432/taskmanagement",
+                "POSTGRES_PASSWORD": "${input:postgres_password}",
+                "POSTGRES_USER": "${input:postgres_password}"
+            }
+        }
+    },
+    "inputs": [
+        {
+            "id": "postgres_password",
+            "type": "promptString",
+            "description": "Please provide the PostgreSQL password (if any)"
+        },
+        {
+            "id": "postgres_password",
+            "type": "promptString",
+            "description": "Please provide the PostgreSQL password (if any)"
+        }
+    ]
+}
