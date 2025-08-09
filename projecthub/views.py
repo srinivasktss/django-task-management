@@ -1,3 +1,4 @@
+from operator import mul
 from django.core.exceptions import ValidationError
 from django.shortcuts import render
 from rest_framework.response import Response
@@ -5,8 +6,12 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login
+
+from projecthub.tasks import add, xsum, xsum
 from .models import Project
 from .serializers import ProjectSerializer
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import permission_classes
 
 # Create your views here.
 @api_view(['GET'])
@@ -58,3 +63,25 @@ def user_login(request):
     else:
         # Invalid credentials: return an error response
         return Response("Invalid credentials.", status=status.HTTP_401_UNAUTHORIZED)
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def add_task(request):
+    data = request.query_params
+    task_type = data.get('task_type')
+    try:
+        a:int = int(data.get('a', 0))
+        b:int = int(data.get('b', 0))
+    except ValueError:
+        return Response("Invalid input. Please provide integers for 'a' and 'b'.", status=status.HTTP_400_BAD_REQUEST)
+
+    if task_type == 'add':
+        result = add.delay(a, b)
+    elif task_type == 'mul':
+        result = mul.delay(a, b)
+    elif task_type == 'xsum':
+        result = xsum.delay([a, b])
+    else:
+        return Response("Invalid task type.", status=status.HTTP_400_BAD_REQUEST)
+
+    return Response({"task_id": result.id}, status=status.HTTP_202_ACCEPTED)

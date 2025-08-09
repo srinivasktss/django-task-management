@@ -13,6 +13,19 @@
                 "runserver"
             ],
             "django": true
+        },
+        {
+            "name": "Python Debugger: Celery",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "celery",
+            "args": [
+                "-A",
+                "taskmanagement",
+                "worker",
+                "--loglevel=info",
+                "--pool=solo"
+            ]
         }
     ]
 }
